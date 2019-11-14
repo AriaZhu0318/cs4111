@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+  {% block css %}
+    {{ super() }}
+    <style>
+    .product-item{
+      margin-top: 10px;
+    }
+    </style>
+  {% endblock %}
+{% block content %}
+  <header>
+    <h5>{% if login_user %}<a href="/center">{{ login_user }}</a> <a href="{{ url_for('sign_out') }}">sign out</a>{% else %}<a href="{{ url_for("login") }}">Login</a>{% endif %}</h5>
+  </header>
+  <h2>{{ brand.0 }}</h2>
+  <div class="brand-brief">
+      {{ brand.1 }}
+  </div>
+  <span>Brand owned products</span>
+  {% if not product_list %}
+  <span>No product!</span>
+  {% endif %}
+  <div class="products-list flex-container">
+      {% for product in product_list %}
+        <div class="product-item flex-item">
+          <a href="/product/{{ product.0 }}">
+          <span>{{ product.1 }}</span>
+          <span class="font-stress-red">{{ product.2 }} {{ product.3 }}</span>
+          {% if product.4 %}<font class="font-stress-red">shipfree</font>{% endif %}
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+
+{% endblock %}

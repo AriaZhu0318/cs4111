@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+  {% block css %}
+    {{ super() }}
+    <style>
+
+    </style>
+  {% endblock %}
+{% block content %}
+  <header>
+    <h5>{% if login_user %}<a href="/center">{{ login_user }}</a>  <a href="{{ url_for('sign_out') }}">sign out</a>{% else %}<a href="{{ url_for("login") }}">Login</a>{% endif %}</h5>
+  </header>
+  <span>order details</span>
+  <div class="order-item">
+      {% for product in order_products %}
+        <div>{{ loop.index }}:<a href="/product/{{ product.0 }}"><span>name:{{ product.1 }}</span>
+          <span>price:{{ product.2 }}{{ product.3 }}</span>
+          <span>number:{{ product.4 }}</span>
+        </a></div>
+      {% endfor %}
+  </div>
+{% endblock %}

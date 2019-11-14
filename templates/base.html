@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+  <script src="/static/jquery.js"></script>
+  {% block head_file %} {% endblock %}
+  {% block css %}
+    <style>
+      body {
+       width: 80%;
+       margin-left: 10%;
+        text-align: center;
+      }
+      a{
+        text-decoration:none
+      }
+      h5 {
+      margin-left: 90%;
+    }
+        .font-stress-red{
+        color: red;
+      }
+    .flex-container {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+}
+    .flex-item {
+      background-color: lightgrey;
+  }
+    </style>
+  {% endblock %}
+</head>
+<body>
+    {% block content %}
+    {% endblock %}
+</body>
+    {% block js %}{% endblock %}
+</html>

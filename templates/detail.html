@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+  {% block css %}
+    {{ super() }}
+    <style>
+
+    .review-list{
+      width: 60%;
+      margin-left: 20%;
+    }
+    .review-item{
+      margin-top: 5px;
+    }
+    .buy-item{
+      text-align: center;
+      margin-left: 30%;
+      width: 400px;
+      height: 100%;
+      background-color: rgb(220, 240, 230);
+    }
+    h3{
+      margin-top: 5px;
+    }
+    .view_close{
+      display: none;
+    }
+    #show-add-address{
+      display: none;
+    }
+    </style>
+  {% endblock %}
+{% block content %}
+  <header>
+    <h5>{% if login_user %}<a href="/center">{{ login_user }}</a>  <a href="{{ url_for('sign_out') }}">sign out</a>{% else %}<a href="{{ url_for("login") }}">Login</a>{% endif %}</h5>
+  </header>
+  <div class="product-item">
+    <h2>{{ product.3 }}</h2>
+    <span>price:<font class="font-stress-red">{{ product.4 }}{{ product.5 }}</font></span>
+    <br>
+    {% if product.6 %}<font class="font-stress-red">shipfree</font><br>{% endif %}
+    <span>stock :<font>{{ product.7 }}</font></span>
+    <br>
+    <span>brand :<a href="/brand/{{ product_brand.0 }}"><font>{{ product_brand.1 }}</font></a></span>
+      <br>
+      <button id="buy">buy</button>
+      <div class="buy-item view_close">
+        <div id="show-add-address">
+          <input type="text" name="consignee_name" placeholder="consignee name">
+          <input type="text" name="consignee_tel" placeholder="consignee tel">
+          <input type="text" name="delivery_address" placeholder="delivery address">
+          <input type="text" name="zipcode" placeholder="zipcode">
+          <input type="text" name="city" placeholder="city">
+          <input type="text" name="country" placeholder="country">
+          <br>
+          <button id="btn-add-address">add</button>
+        </div>
+        <h3>payment</h3>
+        <div><label>number </label><input type="number" min=1 max=99 name="buy_num" value=1 onchange="check_buy_num(this)">
+      </div>
+        <div>
+        <label>mode of payment </label>
+        <select name="pay_func">
+        <option value="Credit Card">Credit Card</option>
+        <option value="Paypal">Paypal</option>
+        </select>
+        </div>
+        <div id="address-item">
+        </div>
+          <br>
+          <button id="to_pay">pay</button>
+      </div>
+  </div>
+  <br>
+  <span>Review</span>
+  {% if not review_list %}
+  <span>No review!</span>
+  {% endif %}
+  <div class="review-list flex-container">
+    {% for review in review_list %}
+    <div class="review-item flex-item">
+      <font>{{ review.0 }} -</font>
+      <span>{{ review.1 }}</span>
+    </div>
+  {% endfor %}
+  </div>
+{% endblock %}
+{% block js %}
+  <script>
+  var product_id = {{ product.0 }}
+  function check_buy_num(e) {
+      if($(e).val()>99 || $(e).val()<1){
+          $(e).val(1);
+      }
+  };
+  $('#buy').on('click', function () {
+
+      add_add();
+      $('#address-item').on('click', '#add-address', function () {
+          $('#show-add-address').show()
+      });
+
+      if($(this).next().hasClass('view_close')){
+        $(this).next().removeClass('view_close')
+      }else {
+        $(this).next().addClass('view_close')
+      }
+
+  $('#to_pay').on('click', function () {
+      var data = {
+          'product_price': {{ product.4 }},
+          'product_id': product_id,
+          'num': $('input[name="buy_num"]').val(),
+          'pay_func': $('select[name="pay_func"]').find("option:selected").attr("value"),
+          'add_id': $('#address-item').find("option:selected").attr("value")
+      };
+      var form = $("<form method='post'></form>");
+       form.attr({"action": '/pay'});
+        for (arg in data)
+        {
+            var input = $("<input type='hidden'>");
+               input.attr({"name":arg});
+              input.val(data[arg]);
+              form.append(input);
+          }
+        $(document.body).append(form);
+        if(data['add_id']) {
+            form.submit();
+        }else {
+            alert('Please select receiving address!')
+        }
+  });
+  $('#btn-add-address').on('click', function () {
+      var consignee_name = $('input[name="consignee_name"]').val();
+      var consignee_tel = $('input[name="consignee_tel"]').val();
+      var delivery_address = $('input[name="delivery_address"]').val();
+      var zipcode = $('input[name="zipcode"]').val();
+      var city = $('input[name="city"]').val();
+      var country = $('input[name="country"]').val();
+      var data = {
+          'consignee_name': consignee_name, 'consignee_tel': consignee_tel,
+          'delivery_address': delivery_address, 'zipcode': zipcode, 'city': city, 'country': country
+      };
+      if (consignee_name && consignee_tel && delivery_address && zipcode && city && country) {
+        $.post('/customer/address/add', data, function (res) {
+            if (res){
+                $('#show-add-address').hide();
+                $('#address-item').empty();
+                add_add();
+            }else {
+                alert('Address add failed!');
+                $('#show-add-address').hide();
+            }
+        })
+      }else {
+          alert('Each parameter cannot be empty!')
+          $('#show-add-address').hide();
+      }
+  })
+        function add_add() {
+      $.get('/customer/address',function (res) {
+          if (res==='login'){
+              window.location.href='http://127.0.0.1:5000/login'
+          }else {
+              var html_str = '<label>Address</label><select name="address">';
+              for (var i=0; i< res.address_list.length; i++){
+                        var address = res.address_list[i];
+                        html_str += '<option value='+ address[0] +'>' + address[1] +'-'+ address[2] + '-'+  address[3] + '</option>'
+                    }
+               html_str += '</select><button id="add-address">+</button>';
+               $('#address-item').html(html_str)
+          }
+      });
+  }
+
+  });
+  </script>
+{% endblock %}

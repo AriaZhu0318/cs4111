@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block css %}
+  {{ super() }}
+  <style>
+    .label-1{
+      background:rgb(150, 250, 250);
+    }
+    .product-item{
+      margin-top: 10px;
+    }
+    .search-item{
+      margin-bottom: 10px;
+    }
+  .hotSearch{
+    margin-top: 10px;
+  }
+  </style>
+{% endblock %}
+{% block content %}
+  <header>
+    <h5>{% if login_user %}<a href="/center">{{ login_user }}</a> <a href="{{ url_for('sign_out') }}">sign out</a>{% else %}<a href="{{ url_for("login") }}">Login</a>{% endif %}</h5>
+  </header>
+  <main>
+    <div class="search-item">
+      <input type="text" id="search" placeholder="keyword">
+      <button id="btn-search">search</button>
+    </div>
+      <div class="brand-list">
+      <span class="font-stress-red">brand:</span>
+      {% for brand in brand_list %}
+        <span class="label-1"><a class="hot-word" href="/brand/{{ brand.0 }}">{{ brand.1 }}</a></span>
+      {% endfor %}
+    </div>
+    <div class="hotSearch">
+      <span class="font-stress-red">hotSearch:</span>
+      {% for hot_word in hot_search_list %}
+        <span class="label-1"><a class="hot-word" href="/product/{{ hot_word.1 }}">{{ hot_word.0 }}</a></span>
+      {% endfor %}
+    </div>
+    <div class="products-list flex-container">
+      {% for product in product_list %}
+        <div class="product-item flex-item">
+          <a href="/product/{{ product.0 }}">
+          <span>{{ product.1 }}</span>
+          <span class="font-stress-red">{{ product.2 }} {{ product.3 }}</span>
+          {% if product.4 %}<font class="font-stress-red">shipfree</font>{% endif %}
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </main>
+{% endblock %}
+{% block js %}
+  <script>
+    $('#btn-search').on('click', function () {
+        var search_key = $('#search').val();
+        var html_str = '';
+        if (search_key){
+            $.get('/search?keys='+ search_key, function (res) {
+                $('.products-list').empty();
+                if(res.products.length){
+                    for (var i=0; i< res.products.length; i++){
+                        var product = res.products[i];
+                        html_str += '<div class="product-item flex-item"><a href="/product/'
+                            + product[0] + '"><span>' + product[1] + '</span><span class="font-stress-red">'
+                            + product[2] + product[3] + '</span>' + is_shipfree(product[4]) + '</a></div>'
+                    }
+                    $('.products-list').html(html_str)
+                }else {
+                    alert('No product found!')
+                }
+            })
+        }else {
+            alert('Search key cannot be empty!')
+        }
+    });
+  function is_shipfree(e) {
+      if (e==='true'){
+          return '<font class="font-stress-red">shipfree</font>'
+      }else {
+          return ''
+      }
+  }
+  </script>
+{% endblock %}

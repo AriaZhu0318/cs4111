@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ tips }}</h2>
+  <a href="{{ url_for('login') }}">login</a>
+  <br>
+  <a href="{{ url_for('index') }}">home page</a>
+  <br>
+  <a href="{{ url_for('signup') }}">sign up</a>
+{% endblock %}

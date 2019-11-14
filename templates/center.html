@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block css %}
+  {{ super() }}
+  <style>
+    .order-item, .address-item{
+      margin-top: 8px;
+    }
+  </style>
+{% endblock %}
+{% block content %}
+  <header>
+    <h5>{% if login_user %}<a href="/center">{{ login_user }}</a>  <a href="{{ url_for('sign_out') }}">sign out</a>{% else %}<a href="{{ url_for("login") }}">Login</a>{% endif %}</h5>
+  </header>
+  <span>order</span>
+  {% if not order_list %}
+    <span>No order!</span>
+  {% endif %}
+  <div class="order-list flex-container">
+      {% for order in order_list %}
+        <div class="order-item flex-item">
+          <a href="order/{{ order.0 }}">
+          <span>amount:{{ order.1 }}</span>
+          <span>mode of payment:{{ order.2 }}</span>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  <span>address</span>
+  {% if not address_list %}
+  <span>No address!</span>
+  {% endif %}
+  <div class="address-list flex-container">
+      {% for address in address_list %}
+        <div class="address-item flex-item">
+          <span>consignee_name:{{ address.0}}</span>
+          <span>consignee_tel:{{ address.1 }}  zipcode:{{ address.3 }}</span>
+          <span>address:{{ address.2}} {{ address.4 }} {{ address.5 }}</span>
+        </div>
+      {% endfor %}
+    </div>
+
+{% endblock %}
