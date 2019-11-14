@@ -1,5 +1,5 @@
 # Databasecs4111
-The PostgreSQL account：wz2500@columbia.edu; password: 4111
+
 
 The URL of your web application: http://35.238.168.24:8111/index 
 
